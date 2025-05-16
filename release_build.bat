@@ -11,8 +11,8 @@ set "cpp_list=cpp_files.txt"
 set "obj_list=obj_files.txt"
 set "exe_name=app_release.exe"
 set "compiler=cl"
-set "cflags=/c /O2 /GL /W4 /GR- /EHs- /std:c++14 /Fo%build_dir%\ "
-set "ldflags=/LTCG /OPT:REF /OPT:ICF /INCREMENTAL:NO /OUT:%build_dir%\%exe_name%"
+set "cflags=/c /O2 /GL /W4 /GR- /EHs- /I\"%source_dir%\" /std:c++14 /Fo%build_dir%\ "
+set "ldflags=/LTCG /OPT:REF /OPT:ICF /INCREMENTAL:NO /Fe%build_dir%\%exe_name%"
 
 :: Create release directory
 if not exist "%build_dir%" mkdir "%build_dir%"

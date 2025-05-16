@@ -11,10 +11,10 @@ set "cpp_list=cpp_files.txt"
 set "obj_list=obj_files.txt"
 set "exe_name=app_debug.exe"
 set "compiler=cl"
-set "cflags=/Zi /fsanitize=address /EHsc /RTCc /RTCs /RTC1 /MDd /std:c++14 /W4 /Od /Fo%build_dir%\ /Fd:%build_dir%\vc140.pdb"
-set "ldflags= /DEBUG /OUT:%build_dir%\%exe_name% /INFERASANLIBS"
+set "cflags=/Zi /EHsc /MDd /std:c++14 /W4 /Od /I\"%source_dir%\" /Fo%build_dir%\ /Fd:%build_dir%\vc140.pdb"
+set "ldflags=/DEBUG /Fe%build_dir%\%exe_name% /INFERASANLIBS"
 
-:: Create build directory if it doesn't exist
+:: Create build directory
 if not exist "%build_dir%" mkdir "%build_dir%"
 
 :: Clean old files
@@ -50,21 +50,19 @@ for /f %%f in (%cpp_list%) do (
 )
 
 :: === Link phase ===
-echo Linking all object files...
-%compiler% @%obj_list% /link %ldflags%
-
+echo Linking object files...
+%compiler% @%obj_list% %ldflags%
 if errorlevel 1 (
     echo Linking failed.
     pause
     exit /b 1
 )
 
-:: === End Timer and Report Duration ===
+:: === End Timer ===
 for /f "tokens=1-4 delims=:.," %%a in ("%time%") do (
     set "end=%%a*3600 + %%b*60 + %%c + %%d/100"
 )
 
-:: Calculate duration using PowerShell
 for /f %%t in ('powershell -nologo -command "[math]::Round((%end%) - (%start%), 2)"') do set duration=%%t
 
 echo Debug build complete: %build_dir%\%exe_name%
