@@ -10,7 +10,7 @@
       "request": "launch",
       "program": "${workspaceFolder}/build/app_debug.exe",
       "args": [],
-      "stopAtEntry": true,
+      "stopAtEntry": false,
       "cwd": "${workspaceFolder}/build",
       "environment": [],
       "console": "externalTerminal"
