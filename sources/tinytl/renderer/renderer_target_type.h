@@ -4,7 +4,8 @@ enum RendererTargetType
 {
     Terminal = 0,
     Window,
-    Offscreen
+    Offscreen,
+    RENDERER_TARGETTYPE_SIZE
 };
 
 #endif

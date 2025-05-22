@@ -2,24 +2,34 @@
 #define RENDERER_WIN32_IMPL_INL
 #include <tinytl/renderer/renderer_common.h>
 #ifdef PLATFORM_WINDOWS 
-void Renderer_PlatformInit(Vector<int,RENDERER_PARAMETERS_INDICES::RENDERER_PARAMETERS_INDICES_SIZE>& renderer_params) 
+void Renderer_Platform_Init() 
+{
+
+}
+
+void Renderer_Platform_Update()
 {
     
 }
 
-void Renderer_PlatformUpdate()
-{
-    
-}
-
-void Renderer_PlatformShutdown() 
+void Renderer_Platform_Shutdown() 
 {
    
 }
 
-void Renderer_PlatformRetrieveConfigs(Vector<int,RENDERER_PARAMETERS_INDICES::RENDERER_PARAMETERS_INDICES_SIZE>& config) 
+inline uint8_t Renderer_Platform_Get_TargetType()
 {
-    
+    return 0;
+}
+
+inline uint8_t Renderer_Platform_Get_HardwareBackend()
+{
+    return 0;
+}
+
+inline uint8_t Renderer_Platform_Get_DataFormat()
+{
+    return 0;
 }
 #endif
 #endif

@@ -2,27 +2,36 @@
 #define RENDERER_H
 #include "renderer_common.h"
 
-extern Vector<int,RENDERER_PARAMETERS_INDICES::RENDERER_PARAMETERS_INDICES_SIZE> renderer_information;        
+       
 
-inline void Renderer_Init(Vector<int,RENDERER_PARAMETERS_INDICES::RENDERER_PARAMETERS_INDICES_SIZE> renderer_params)
+inline void Renderer_Init()
 {
-    renderer_information = renderer_params;
-    Renderer_PlatformInit(renderer_information);
+    Renderer_Platform_Init();
 }
 
 inline void Renderer_Update()
 {
-    Renderer_PlatformUpdate();
+    Renderer_Platform_Update();
 }
 
-inline void RetrieveAllConfigs(Vector<int,RENDERER_PARAMETERS_INDICES::RENDERER_PARAMETERS_INDICES_SIZE>& config)
+inline uint8_t Renderer_Get_TargetType()
 {
-    Renderer_PlatformRetrieveConfigs(config);
+    return Renderer_Platform_Get_TargetType();
+}
+
+inline uint8_t Renderer_Get_HardwareBackend()
+{
+    return Renderer_Platform_Get_HardwareBackend();
+}
+
+inline uint8_t Renderer_Get_DataFormat()
+{
+    return Renderer_Platform_Get_DataFormat();
 }
 
 inline void Renderer_Shutdown()
 {
-   Renderer_PlatformShutdown();
+   Renderer_Platform_Shutdown();
 }
 
 

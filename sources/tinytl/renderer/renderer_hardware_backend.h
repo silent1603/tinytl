@@ -4,7 +4,8 @@
 enum RendererHardwareBackend
 {
     CPU = 0,
-    GPU
+    GPU,
+    RENDERER_HARDWARE_BACKEND_SIZE
 };
 
 #endif
