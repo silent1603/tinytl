@@ -1,6 +1,6 @@
 #ifndef ERRORLOGGERWINIMPL_H
 #define ERRORLOGGERWINIMPL_H
-#include <tinytl/Platforms.h>
+#include <tinytl/platform_selector.h>
 #if PLATFORMS_WINDOWS
 inline void UIErrorPopup(char *msg)
 {
