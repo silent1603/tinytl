@@ -11,7 +11,7 @@ set "cpp_list=%build_dir%\cpp_files.txt"
 set "obj_list=%build_dir%\obj_files.txt"
 set "exe_name=app_release.exe"
 set "compiler=cl"
-set "cflags=/c /O2 /GL /W4 /GR- /EHs- /std:c++14 /I\"%source_dir%\" /Fo%build_dir%\\"
+set "cflags=/c /O2 /GL /W4 /GR- /EHs- /std:c++14 /DUNICODE /I\"%source_dir%\" /Fo%build_dir%\\"
 set "ldflags=/LTCG /OPT:REF /OPT:ICF /INCREMENTAL:NO /OUT:%build_dir%\%exe_name% user32.lib"
 
 :: === Prepare build directory ===

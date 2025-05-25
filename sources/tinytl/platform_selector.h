@@ -19,6 +19,7 @@
 # endif
 
 #if PLATFORM_WINDOWS
+#define UNICODE
 #define WIN32_LEAN_AND_MEAN
 #define VC_EXTRALEAN
 #define NOMINMAX

@@ -12,7 +12,7 @@ set "cpp_list=%build_dir%\test_cpp_files.txt"
 set "obj_list=%build_dir%\test_obj_files.txt"
 set "exe_name=test_app_debug.exe"
 set "compiler=cl"
-set "cflags=/c /Zi /EHsc /MDd /std:c++14 /W4 /Od /I\"%source_dir%\" /I"%tests_dir%" /Fd%build_dir%\vc140.pdb /Fo%build_dir%\"
+set "cflags=/c /Zi /EHsc /MDd /std:c++14 /W4 /Od /DUNICODE  /I\"%source_dir%\" /I"%tests_dir%" /Fd%build_dir%\vc140.pdb /Fo%build_dir%\"
 set "ldflags=/DEBUG /OUT:%build_dir%\%exe_name% user32.lib"
 
 :: === Prepare build directory ===

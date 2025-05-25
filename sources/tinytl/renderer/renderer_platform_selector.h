@@ -1,6 +1,6 @@
 #ifndef RENDERER_PLATFORM_SELECTOR_H
 #define RENDERER_PLATFORM_SELECTOR_H
-#include <tinytl/platform_selector.h>
+#include "tinytl/platform_selector.h"
 
 #ifdef PLATFORM_WINDOWS 
 #include <gl/GL.h>

@@ -1,96 +1,82 @@
-// #include "tinytl/container/Vector.h"
-// #include "tinytl/math/VectorOperator.h"
-// #include "tinytl/math/MathConstant.h"
-// #include "tinytl/formatter/formatter.h"
-// #include "tinytl/Platforms.h"
+#include <windows.h>
+#include <conio.h> // for _kbhit() and _getch()
+#include "tinytl/renderer/renderer.h"
+#include "tinytl/renderer/console_renderer.h"
+#include "tinytl/io/io.h"
+int main(int argc, char *argv[])
+{
+    ConsoleRendererInitParams inputParams = {};
+    inputParams.fontSize = {MIN_FONT_WIDTH, MIN_FONT_HEIGHT};
+    inputParams.windowSize = {1280, 720};
+    inputParams.cursorInfo.bVisible = false;
+    EventIn events;
+    if (Console_Renderer_Init(inputParams))
+    {
 
-// constexpr int bufferSize = 512;
-// int main(int argc, char* argv[]) 
-// {
+        events.hInput =  GetStdHandle(STD_INPUT_HANDLE);
+        const int width = consoleRendererData.screenColumnRow.data[0];
+        const int height = consoleRendererData.screenColumnRow.data[1];
 
-//     HANDLE hConsole = NULL;
-//     DWORD written = 0;
+        // High-resolution timer setup
+        LARGE_INTEGER freq, tStart, tNow;
+        QueryPerformanceFrequency(&freq);
+        QueryPerformanceCounter(&tStart);
 
-//     // Get the console handle
-//     hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+        float posX = 0.0f;
+        const float speed = 40.0f; // cells/sec
 
-//     Vector<float, 3> v1 = {{1, 2, 3}};
-//     Vector<float, 3> v2 = {{4, 5, 6}};
-//     auto result = Add(v1, v2); //runtime
+        CHAR_INFO clearChar;
+        clearChar.Char.UnicodeChar = ' ';
+        clearChar.Attributes = BACKGROUND_BLUE;
 
+        bool running = true;
+        while (running)
+        {
+            // Check input (non-blocking)
+            IO_Console_PollEvents(events);
+            for (int i = 0; i < events.numEvents; ++i)
+            {
+                const auto &record = events.eventsRecord[i];
+                switch (record.EventType)
+                {
+                case KEY_EVENT:
+                {
+                    const KEY_EVENT_RECORD &key = record.Event.KeyEvent;
+                    if (key.bKeyDown && key.wVirtualKeyCode == VK_ESCAPE)
+                        running = false;
+                    break;
+                }
+                case MOUSE_EVENT:
+                    break;
+                case WINDOW_BUFFER_SIZE_EVENT:
+                    break;
+                }
+            }
+            // Delta time
+            QueryPerformanceCounter(&tNow);
+            float deltaTime = float(tNow.QuadPart - tStart.QuadPart) / freq.QuadPart;
+            tStart = tNow;
 
-//     static_assert(PI<float> > 3.14f && PI<float> < 3.15f, "PI must be evaluated at compile time");
+            Console_Renderer_Clear(clearChar);
 
-//     TCHAR buffer[bufferSize];
-//     ZeroMemory(buffer,bufferSize);
-//     StringCchPrintf(buffer, bufferSize, TEXT("PI<int>: %d\n"), PI<int>);
-//     SetConsoleTextAttribute(hConsole, FOREGROUND_RED);
-//     WriteConsole(hConsole,buffer,lstrlen(buffer),&written,NULL);
-//     OutputDebugString(buffer);
-    
-//     ZeroMemory(buffer,bufferSize);
-//     StringCchPrintf(buffer, bufferSize, TEXT("PI<int>: %.3f\n"), PI<float>);
-//     SetConsoleTextAttribute(hConsole, FOREGROUND_RED);
-//     WriteConsole(hConsole,buffer,lstrlen(buffer),&written,NULL);
-//     OutputDebugString(buffer);
+            // Update position
+            posX += speed * deltaTime;
+            if (posX >= width)
+                posX = 0;
 
-//     ZeroMemory(buffer,bufferSize);
-//     StringCchPrintf(buffer, bufferSize, TEXT("PI<int>: %.6f\n"),PI<double>);
-//     SetConsoleTextAttribute(hConsole, FOREGROUND_RED);
-//     WriteConsole(hConsole,buffer,lstrlen(buffer),&written,NULL);
-//     OutputDebugString(buffer);
-    
+            // Draw animated char
+            int x = static_cast<int>(posX);
+            int y = height / 2;
+            int index = y * width + x;
+            consoleRendererData.screenBuffer[index].Char.UnicodeChar = 0x2588;
+            consoleRendererData.screenBuffer[index].Attributes = BACKGROUND_BLUE | FOREGROUND_GREEN;
 
-//     return 0;
-// }
+            // Push to console
+            Console_Renderer_Present();
+        }
 
-#include <memory>
-#include <iostream>
-#include <vector>
-
-template<typename T>
-struct MyAllocator {
-    using value_type = T;
-
-    MyAllocator() = default;
-
-    template<typename U>
-    MyAllocator(const MyAllocator<U>&) {}
-
-    T* allocate(std::size_t n) {
-        return static_cast<T*>(::operator new(n * sizeof(T)));
+        Console_Renderer_Shutdown();
     }
-
-    void deallocate(T* p, std::size_t) {
-        ::operator delete(p);
-    }
-
-
-    bool operator==(const MyAllocator&) const { return true; }
-    bool operator!=(const MyAllocator&) const { return false; }
-};
-
-int main() {
-    MyAllocator<int> alloc;
-
-    std::vector<int, MyAllocator<int>> vec(alloc);
-
-    std::cout << "Adding elements to vector:" << std::endl;
-    vec.push_back(1);
-    vec.push_back(2);
-    vec.push_back(3);
-
-    std::cout << "Vector contents: ";
-    for (int i : vec) {
-        std::cout << i << " ";
-    }
-    std::cout << std::endl;
-
-    std::cout << "Resizing vector to 1 element:" << std::endl;
-    vec.resize(1);
-
-    std::cout << "Clearing vector:" << std::endl;
-    vec.clear();
 
     return 0;
 }

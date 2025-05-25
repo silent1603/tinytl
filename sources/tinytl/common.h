@@ -9,4 +9,18 @@
 #include <stdint.h>
 #include <stdalign.h>
 #include <stdnoreturn.h>
+
+enum class CharacterEncoding {
+    ASCII,
+    UTF8,
+    UTF16
+};
+
+enum class PixelFormat {
+    RGB,
+    RGBA,
+    Grayscale
+};
+
+
 #endif
