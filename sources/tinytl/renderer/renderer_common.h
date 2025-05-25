@@ -7,8 +7,8 @@
 // ############################# CONSOLE VARIABLES #######################################
 
 #define SUPPORT_CONSOLE_TITLE_NAME_SIZE 128
-#define MIN_FONT_WIDTH  4 
-#define MIN_FONT_HEIGHT  6 
+#define MIN_FONT_WIDTH  2 
+#define MIN_FONT_HEIGHT  5 
 #define SUPPORT_SCREEN_WIDTH_PIXELS   3840 
 #define SUPPORT_SCREEN_HEIGHT_PIXELS  2160 
 

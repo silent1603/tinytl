@@ -1,8 +1,7 @@
-#include <windows.h>
-#include <conio.h> // for _kbhit() and _getch()
 #include "tinytl/renderer/renderer.h"
 #include "tinytl/renderer/console_renderer.h"
 #include "tinytl/io/io.h"
+
 int main(int argc, char *argv[])
 {
     ConsoleRendererInitParams inputParams = {};
@@ -13,9 +12,9 @@ int main(int argc, char *argv[])
     if (Console_Renderer_Init(inputParams))
     {
 
-        events.hInput =  GetStdHandle(STD_INPUT_HANDLE);
-        const int width = consoleRendererData.screenColumnRow.data[0];
-        const int height = consoleRendererData.screenColumnRow.data[1];
+        events.hInput = GetStdHandle(STD_INPUT_HANDLE);
+        const int width = consoleRendererData.bufferSize.X;
+        const int height = consoleRendererData.bufferSize.Y;
 
         // High-resolution timer setup
         LARGE_INTEGER freq, tStart, tNow;
@@ -34,22 +33,27 @@ int main(int argc, char *argv[])
         {
             // Check input (non-blocking)
             IO_Console_PollEvents(events);
-            for (int i = 0; i < events.numEvents; ++i)
+            if (events.numEvents > 0)
             {
-                const auto &record = events.eventsRecord[i];
-                switch (record.EventType)
+                for (int i = 0; i < events.numEventsRead; ++i)
                 {
-                case KEY_EVENT:
-                {
-                    const KEY_EVENT_RECORD &key = record.Event.KeyEvent;
-                    if (key.bKeyDown && key.wVirtualKeyCode == VK_ESCAPE)
-                        running = false;
-                    break;
-                }
-                case MOUSE_EVENT:
-                    break;
-                case WINDOW_BUFFER_SIZE_EVENT:
-                    break;
+                    const auto &record = events.eventsRecord[i];
+                    switch (record.EventType)
+                    {
+                    case KEY_EVENT:
+                    {
+                        const KEY_EVENT_RECORD &key = record.Event.KeyEvent;
+                        if (key.bKeyDown && key.wVirtualKeyCode == VK_ESCAPE)
+                            running = false;
+                        break;
+                    }
+                    case MOUSE_EVENT:
+                        break;
+                    case WINDOW_BUFFER_SIZE_EVENT:
+                        break;
+                    case FOCUS_EVENT:
+                        break;
+                    }
                 }
             }
             // Delta time
@@ -59,19 +63,10 @@ int main(int argc, char *argv[])
 
             Console_Renderer_Clear(clearChar);
 
-            // Update position
-            posX += speed * deltaTime;
-            if (posX >= width)
-                posX = 0;
 
-            // Draw animated char
-            int x = static_cast<int>(posX);
-            int y = height / 2;
-            int index = y * width + x;
-            consoleRendererData.screenBuffer[index].Char.UnicodeChar = 0x2588;
-            consoleRendererData.screenBuffer[index].Attributes = BACKGROUND_BLUE | FOREGROUND_GREEN;
-
-            // Push to console
+            consoleRendererData.screenBuffer[0].Char.UnicodeChar = L'X';
+            consoleRendererData.screenBuffer[0].Attributes = BACKGROUND_BLUE | FOREGROUND_GREEN;
+         
             Console_Renderer_Present();
         }
 

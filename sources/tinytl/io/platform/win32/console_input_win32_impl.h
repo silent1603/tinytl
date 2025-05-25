@@ -6,15 +6,16 @@ struct EventIn
 {
     INPUT_RECORD eventsRecord[MAX_EVENT_RECEIVED];
     HANDLE hInput; 
-    DWORD eventsRead;
-    DWORD numEvents ;
+    DWORD numEvents;  // How many events have happened?
+    DWORD numEventsRead; // How many events have we read from the console?
 };
+
 inline void IO_Console_PollEvents(EventIn& event)
 {
     GetNumberOfConsoleInputEvents(event.hInput, &event.numEvents);
-    if(event.numEvents > 0)
+    if(event.numEvents != 0)
     {
-        ReadConsoleInput(event.hInput, event.eventsRecord, event.numEvents, &event.eventsRead);
+        ReadConsoleInput(event.hInput, event.eventsRecord, event.numEvents, &event.numEventsRead);
     }
 }
 #endif
