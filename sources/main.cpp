@@ -2,7 +2,7 @@
 #include "tinytl/renderer/console_renderer.h"
 #include "tinytl/io/io.h"
 
-int main(int argc, char *argv[])
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
     ConsoleRendererInitParams inputParams = {};
     inputParams.fontSize = {MIN_FONT_WIDTH, MIN_FONT_HEIGHT};
@@ -63,10 +63,18 @@ int main(int argc, char *argv[])
 
             Console_Renderer_Clear(clearChar);
 
+            
+            // Update position
+            posX += speed * deltaTime;
+            if (posX >= width)
+                posX = 0;
 
-            consoleRendererData.screenBuffer[0].Char.UnicodeChar = L'X';
-            consoleRendererData.screenBuffer[0].Attributes = BACKGROUND_BLUE | FOREGROUND_GREEN;
-         
+            // Draw animated char
+            int x = static_cast<int>(posX);
+            int y = height / 2;
+            int index = y * width + x;
+            consoleRendererData.screenBuffer[index].Char.UnicodeChar = 0x2588;
+            consoleRendererData.screenBuffer[index].Attributes = BACKGROUND_BLUE | FOREGROUND_GREEN;
             Console_Renderer_Present();
         }
 

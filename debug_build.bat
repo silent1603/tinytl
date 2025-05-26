@@ -12,7 +12,7 @@ set "obj_list=%build_dir%\obj_files.txt"
 set "exe_name=app_debug.exe"
 set "compiler=cl"
 set "cflags=/c /Zi /EHsc /MDd /std:c++14 /W4 /Od /DUNICODE /I\"%source_dir%\"  /Fd%build_dir%\vc140.pdb /Fo%build_dir%\"
-set "ldflags=/DEBUG /OUT:%build_dir%\%exe_name%"
+set "ldflags=/DEBUG /OUT:%build_dir%\%exe_name%  /SUBSYSTEM:WINDOWS"
 
 :: === Prepare build directory ===
 if not exist "%build_dir%" mkdir "%build_dir%"

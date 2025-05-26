@@ -2,103 +2,149 @@
 #define CONSOLE_RENDERER_WIN32_IMPL_H
 #include "tinytl/renderer/renderer_common.h"
 #ifdef PLATFORM_WINDOWS
-
+#include <strsafe.h>
 struct ConsoleRendererData
 {
     CHAR_INFO screenBuffer[MAX_CONSOLE_COLS * MAX_CONSOLE_ROWS];
     wchar_t consoleTitleName[SUPPORT_CONSOLE_TITLE_NAME_SIZE];
-    SMALL_RECT windowTerminalSize;
-    HANDLE consoleHandler;
-    DWORD dwBytesWritten;
-    DWORD consoleMode[2];              // old ,current
+    SMALL_RECT writeRegion;
+    HANDLE consoleBufferHandler;
+    HANDLE consoleInputHandler;
+    HANDLE consoleOutputHandler;
+    DWORD consoleIOMode[2];            // input , output
     CONSOLE_CURSOR_INFO cursorInfo[2]; // old , current
     COORD bufferSize = {0, 0};
     COORD bufferCoord = {0, 0};
     Vector<int, 2> maxWindowPixelSize;
     Vector<int, 2> currentWindowPixelSize;
     Vector<int, 2> fontSize;
+    Vector<short, 2> screenColumnRow;
 };
+
+void PrintLastError(const wchar_t *context)
+{
+    DWORD errorCode = GetLastError();
+    LPWSTR messageBuffer = nullptr;
+
+    FormatMessageW(
+        FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+        NULL,
+        errorCode,
+        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+        (LPWSTR)&messageBuffer,
+        0,
+        NULL);
+
+    if (messageBuffer)
+    {
+        wchar_t fullMessage[512];
+        StringCchPrintfW(fullMessage, 512, L"%s failed with error %lu: %s", context, errorCode, messageBuffer);
+        OutputDebugStringW(fullMessage);
+        LocalFree(messageBuffer);
+    }
+}
 
 struct ConsoleRendererInitParams
 {
     Vector<int, 2> windowSize = {0};
     Vector<int, 2> fontSize = {MIN_FONT_WIDTH, MIN_FONT_HEIGHT}; // width , height;
     CONSOLE_CURSOR_INFO cursorInfo;
-    DWORD consoleMode = ENABLE_VIRTUAL_TERMINAL_INPUT | ENABLE_VIRTUAL_TERMINAL_PROCESSING | ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT | ENABLE_EXTENDED_FLAGS;
+    DWORD consoleIOMode[2] = {ENABLE_EXTENDED_FLAGS | ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT, ENABLE_VIRTUAL_TERMINAL_PROCESSING};
 };
+
 ConsoleRendererData consoleRendererData;
 
 inline bool Console_Renderer_Init(ConsoleRendererInitParams inputParams)
 {
-    bool result = 0;
-    HANDLE hConsoleHandler = CreateConsoleScreenBuffer(GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, CONSOLE_TEXTMODE_BUFFER, NULL);
-    result = hConsoleHandler != INVALID_HANDLE_VALUE;
-    result ? void() : OutputDebugString(TEXT("Failed to create screen buffer."));
-    result = SetConsoleActiveScreenBuffer(hConsoleHandler);
+    bool result = 1;
+    if (GetConsoleWindow() == NULL)
+    {
+        result = AllocConsole();
+    }
     if (result)
     {
-        consoleRendererData.consoleHandler = hConsoleHandler;
-        
-        GetConsoleMode(hConsoleHandler, &consoleRendererData.consoleMode[0]);
-        consoleRendererData.consoleMode[1] = inputParams.consoleMode;
-        SetConsoleMode(hConsoleHandler, inputParams.consoleMode);
+        HANDLE hBufferConsoleHandler = CreateConsoleScreenBuffer(GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, CONSOLE_TEXTMODE_BUFFER, NULL);
 
-        CONSOLE_FONT_INFOEX cfi = {sizeof(CONSOLE_FONT_INFOEX)};
-        cfi.dwFontSize.X = consoleRendererData.fontSize.data[0] == 0 ? MIN_FONT_WIDTH : consoleRendererData.fontSize.data[0];
-        cfi.dwFontSize.Y = consoleRendererData.fontSize.data[1] == 0 ? MIN_FONT_HEIGHT : consoleRendererData.fontSize.data[1];
-        cfi.FontFamily = FF_DONTCARE;
-        cfi.FontWeight = FW_NORMAL;
-        const wchar_t *fontName = L"Consolas";
+        result = hBufferConsoleHandler != INVALID_HANDLE_VALUE;
+        result ? void() : OutputDebugString(TEXT("Failed to create screen buffer."));
+        result = SetConsoleActiveScreenBuffer(hBufferConsoleHandler);
 
-        for (int i = 0; i < LF_FACESIZE; ++i)
+        if (result)
         {
-            cfi.FaceName[i] = fontName[i];
-            if (fontName[i] == L'\0')
-                break;
+            consoleRendererData.consoleBufferHandler = hBufferConsoleHandler;
+
+            HANDLE hConsoleInput = GetStdHandle(STD_INPUT_HANDLE);
+            HANDLE hConsoleOutput = GetStdHandle(STD_OUTPUT_HANDLE);
+
+            consoleRendererData.consoleInputHandler = hConsoleInput;
+            consoleRendererData.consoleOutputHandler = hConsoleOutput;
+
+            SetConsoleMode(hConsoleInput, inputParams.consoleIOMode[0]);
+            SetConsoleMode(hConsoleOutput, inputParams.consoleIOMode[1]);
+
+            consoleRendererData.consoleIOMode[0] = inputParams.consoleIOMode[0];
+            consoleRendererData.consoleIOMode[1] = inputParams.consoleIOMode[1];
+            consoleRendererData.maxWindowPixelSize.data[0] = GetSystemMetrics(SM_CXSCREEN);
+            consoleRendererData.maxWindowPixelSize.data[1] = GetSystemMetrics(SM_CYSCREEN);
+
+            consoleRendererData.currentWindowPixelSize.data[0] = consoleRendererData.maxWindowPixelSize.data[0] > inputParams.windowSize.data[0] ? inputParams.windowSize.data[0] : consoleRendererData.maxWindowPixelSize.data[0];
+            consoleRendererData.currentWindowPixelSize.data[1] = consoleRendererData.maxWindowPixelSize.data[1] > inputParams.windowSize.data[1] ? inputParams.windowSize.data[1] : consoleRendererData.maxWindowPixelSize.data[1];
+
+            HWND hWnd = GetConsoleWindow();
+            RECT rect = {0, 0, consoleRendererData.currentWindowPixelSize.data[0], consoleRendererData.currentWindowPixelSize.data[1]};
+            result = SetWindowPos(hWnd, NULL, rect.left, rect.top, rect.right, rect.bottom, SWP_NOACTIVATE | SWP_NOMOVE | SWP_NOOWNERZORDER | SWP_NOZORDER);
+            if (result)
+            {
+                CONSOLE_FONT_INFOEX cfi = {sizeof(CONSOLE_FONT_INFOEX)};
+                consoleRendererData.fontSize.data[0] = inputParams.fontSize.data[0];
+                consoleRendererData.fontSize.data[1] = inputParams.fontSize.data[1];
+                cfi.dwFontSize.X = consoleRendererData.fontSize.data[0] == 0 ? MIN_FONT_WIDTH : consoleRendererData.fontSize.data[0];
+                cfi.dwFontSize.Y = consoleRendererData.fontSize.data[1] == 0 ? MIN_FONT_HEIGHT : consoleRendererData.fontSize.data[1];
+                cfi.FontFamily = FF_DONTCARE;
+                cfi.FontWeight = FW_NORMAL;
+                const wchar_t *fontName = L"Consolas";
+                for (int i = 0; i < LF_FACESIZE; ++i)
+                {
+                    cfi.FaceName[i] = fontName[i];
+                    if (fontName[i] == L'\0')
+                        break;
+                }
+
+                SetCurrentConsoleFontEx(hBufferConsoleHandler, FALSE, &cfi);
+
+                // Set buffer size
+                short preferedCols = consoleRendererData.currentWindowPixelSize.data[0] / consoleRendererData.fontSize.data[0];
+                short preferedRows = consoleRendererData.currentWindowPixelSize.data[1] / consoleRendererData.fontSize.data[1];
+                short consoleCols = MAX_CONSOLE_COLS > preferedCols ? preferedCols : MAX_CONSOLE_COLS;
+                short consoleRows = MAX_CONSOLE_ROWS > preferedRows ? preferedRows : MAX_CONSOLE_ROWS;
+
+                consoleRendererData.screenColumnRow.data[0] = consoleCols;
+                consoleRendererData.screenColumnRow.data[1] = consoleRows;
+                consoleRendererData.bufferSize.X = consoleRendererData.screenColumnRow.data[0];
+                consoleRendererData.bufferSize.Y = consoleRendererData.screenColumnRow.data[1];
+                SetConsoleScreenBufferSize(hBufferConsoleHandler, consoleRendererData.bufferSize);
+
+                const wchar_t *titleName = L"Game";
+                for (int i = 0; i < SUPPORT_CONSOLE_TITLE_NAME_SIZE; ++i)
+                {
+                    consoleRendererData.consoleTitleName[i] = titleName[i];
+                    if (titleName[i] == L'\0')
+                        break;
+                }
+
+                SetConsoleTitle(consoleRendererData.consoleTitleName);
+
+                GetConsoleCursorInfo(hBufferConsoleHandler, &consoleRendererData.cursorInfo[0]);
+                PrintLastError(L"GetConsoleCursorInfo");
+                const CONSOLE_CURSOR_INFO cursorInfo = inputParams.cursorInfo;
+                consoleRendererData.cursorInfo[1] = cursorInfo;
+                SetConsoleCursorInfo(hBufferConsoleHandler, &cursorInfo);
+                PrintLastError(L"SetConsoleCursorInfo");
+                consoleRendererData.writeRegion = {0, 0, SHORT(consoleRendererData.screenColumnRow.data[0] - 1), SHORT(consoleRendererData.screenColumnRow.data[1] - 1)};
+                SetConsoleWindowInfo(hBufferConsoleHandler, TRUE, &consoleRendererData.writeRegion);
+                PrintLastError(L"SetConsoleWindowInfo");
+            }
         }
-
-        SetCurrentConsoleFontEx(hConsoleHandler, FALSE, &cfi);
-
-        int maxWindowWidth = GetSystemMetrics(SM_CXSCREEN);
-        int maxWindowHeight = GetSystemMetrics(SM_CYSCREEN);
-        consoleRendererData.maxWindowPixelSize.data[0] = maxWindowWidth;
-        consoleRendererData.maxWindowPixelSize.data[1] = maxWindowHeight;
-
-        int preferedWindowWidth = inputParams.windowSize.data[0] > maxWindowWidth ? maxWindowWidth : inputParams.windowSize.data[0];
-        consoleRendererData.currentWindowPixelSize.data[0] = preferedWindowWidth;
-
-        int preferedWindowHeight = inputParams.windowSize.data[1] > maxWindowHeight ? maxWindowHeight : inputParams.windowSize.data[1];
-        consoleRendererData.currentWindowPixelSize.data[1] = preferedWindowHeight;
-
-        consoleRendererData.fontSize.data[0] = inputParams.fontSize.data[0];
-        consoleRendererData.fontSize.data[1] = inputParams.fontSize.data[1];
-
-        consoleRendererData.bufferSize.X = SHORT(preferedWindowWidth / inputParams.fontSize.data[0]);
-        consoleRendererData.bufferSize.Y = SHORT(preferedWindowHeight / inputParams.fontSize.data[1]);
-        SetConsoleScreenBufferSize(hConsoleHandler, consoleRendererData.bufferSize);
-
-        consoleRendererData.windowTerminalSize = {0, 0, SHORT(consoleRendererData.bufferSize.X - 1), SHORT(consoleRendererData.bufferSize.Y - 1)};
-        SetConsoleWindowInfo(hConsoleHandler, TRUE, &consoleRendererData.windowTerminalSize);
-
-        const wchar_t *titleName = L"Game";
-        for (int i = 0; i < SUPPORT_CONSOLE_TITLE_NAME_SIZE; ++i)
-        {
-            consoleRendererData.consoleTitleName[i] = titleName[i];
-            if (titleName[i] == L'\0')
-                break;
-        }
-
-        SetConsoleTitle(consoleRendererData.consoleTitleName);
-
-        GetConsoleCursorInfo(hConsoleHandler, &consoleRendererData.cursorInfo[0]);
-        const CONSOLE_CURSOR_INFO cursorInfo = inputParams.cursorInfo;
-        consoleRendererData.cursorInfo[1] = cursorInfo;
-        SetConsoleCursorInfo(hConsoleHandler, &cursorInfo);
-
-        COORD cursorPos = {0, 0};
-        cursorPos.X = cursorInfo.bVisible ? cursorPos.X : 1000;
-        cursorPos.Y = cursorInfo.bVisible ? cursorPos.Y : 1000;
-        SetConsoleCursorPosition(hConsoleHandler, cursorPos);
     }
 
     return result;
@@ -106,11 +152,16 @@ inline bool Console_Renderer_Init(ConsoleRendererInitParams inputParams)
 
 inline void Console_Renderer_Present()
 {
-    WriteConsoleOutput(consoleRendererData.consoleHandler, 
-        consoleRendererData.screenBuffer, 
-        consoleRendererData.bufferSize, 
-        consoleRendererData.bufferCoord, 
-        &consoleRendererData.windowTerminalSize);
+    WriteConsoleOutput(consoleRendererData.consoleBufferHandler,
+                       consoleRendererData.screenBuffer,
+                       consoleRendererData.bufferSize,
+                       consoleRendererData.bufferCoord,
+                       &consoleRendererData.writeRegion);
+}
+
+inline void Console_Renderer_OnWindowSizeChanged()
+{
+
 }
 
 inline void Console_Renderer_DrawLine()
@@ -131,7 +182,7 @@ inline void Console_Renderer_Shutdown()
 {
     HANDLE stdOut = GetStdHandle(STD_OUTPUT_HANDLE);
     SetConsoleActiveScreenBuffer(stdOut);
-    CloseHandle(consoleRendererData.consoleHandler);
+    CloseHandle(consoleRendererData.consoleBufferHandler);
 }
 
 inline void Console_Renderer_Enable_Cursor(bool enable)
