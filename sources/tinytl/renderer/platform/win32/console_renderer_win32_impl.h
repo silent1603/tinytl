@@ -18,7 +18,6 @@ struct ConsoleRendererData
     Vector<int, 2> maxWindowPixelSize;
     Vector<int, 2> currentWindowPixelSize;
     Vector<int, 2> fontSize;
-    Vector<short, 2> screenColumnRow;
 };
 
 void PrintLastError(const wchar_t *context)
@@ -117,11 +116,8 @@ inline bool Console_Renderer_Init(ConsoleRendererInitParams inputParams)
                 short preferedRows = consoleRendererData.currentWindowPixelSize.data[1] / consoleRendererData.fontSize.data[1];
                 short consoleCols = MAX_CONSOLE_COLS > preferedCols ? preferedCols : MAX_CONSOLE_COLS;
                 short consoleRows = MAX_CONSOLE_ROWS > preferedRows ? preferedRows : MAX_CONSOLE_ROWS;
-
-                consoleRendererData.screenColumnRow.data[0] = consoleCols;
-                consoleRendererData.screenColumnRow.data[1] = consoleRows;
-                consoleRendererData.bufferSize.X = consoleRendererData.screenColumnRow.data[0];
-                consoleRendererData.bufferSize.Y = consoleRendererData.screenColumnRow.data[1];
+                consoleRendererData.bufferSize.X = consoleCols;
+                consoleRendererData.bufferSize.Y = consoleRows;
                 SetConsoleScreenBufferSize(hBufferConsoleHandler, consoleRendererData.bufferSize);
 
                 const wchar_t *titleName = L"Game";
@@ -140,7 +136,7 @@ inline bool Console_Renderer_Init(ConsoleRendererInitParams inputParams)
                 consoleRendererData.cursorInfo[1] = cursorInfo;
                 SetConsoleCursorInfo(hBufferConsoleHandler, &cursorInfo);
                 PrintLastError(L"SetConsoleCursorInfo");
-                consoleRendererData.writeRegion = {0, 0, SHORT(consoleRendererData.screenColumnRow.data[0] - 1), SHORT(consoleRendererData.screenColumnRow.data[1] - 1)};
+                consoleRendererData.writeRegion = {0, 0, SHORT(consoleRendererData.bufferSize.X - 1), SHORT(consoleRendererData.bufferSize.Y - 1)};
                 SetConsoleWindowInfo(hBufferConsoleHandler, TRUE, &consoleRendererData.writeRegion);
                 PrintLastError(L"SetConsoleWindowInfo");
             }
@@ -159,9 +155,16 @@ inline void Console_Renderer_Present()
                        &consoleRendererData.writeRegion);
 }
 
-inline void Console_Renderer_OnWindowSizeChanged()
+inline void Console_Renderer_OnWindowSizeChanged(SHORT width, SHORT row)
 {
+    consoleRendererData.bufferSize.X = width;
+    consoleRendererData.bufferSize.Y = row;
+    consoleRendererData.writeRegion.Right = SHORT(consoleRendererData.bufferSize.X - 1);
+    consoleRendererData.writeRegion.Bottom = SHORT(consoleRendererData.bufferSize.Y - 1);
+    consoleRendererData.currentWindowPixelSize.data[0] = int(width) * consoleRendererData.fontSize.data[0] ;
+    consoleRendererData.currentWindowPixelSize.data[1] = int(row) * consoleRendererData.fontSize.data[1];
 
+    SetConsoleWindowInfo(consoleRendererData.consoleBufferHandler, TRUE, &consoleRendererData.writeRegion);
 }
 
 inline void Console_Renderer_DrawLine()

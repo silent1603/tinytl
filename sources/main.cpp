@@ -50,9 +50,17 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
                     case MOUSE_EVENT:
                         break;
                     case WINDOW_BUFFER_SIZE_EVENT:
+                    {
+                        const WINDOW_BUFFER_SIZE_RECORD &sizeEvent = record.Event.WindowBufferSizeEvent;
+                        Console_Renderer_OnWindowSizeChanged(sizeEvent.dwSize.X,sizeEvent.dwSize.Y);
                         break;
+                    }
                     case FOCUS_EVENT:
+                    {
+                        const FOCUS_EVENT_RECORD &focus = record.Event.FocusEvent;
+                        running = &focus.bSetFocus;
                         break;
+                    }
                     }
                 }
             }
@@ -63,7 +71,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
             Console_Renderer_Clear(clearChar);
 
-            
             // Update position
             posX += speed * deltaTime;
             if (posX >= width)
