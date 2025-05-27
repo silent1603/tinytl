@@ -25,6 +25,8 @@
 #define NOMINMAX
 #include <windows.h>
 #pragma comment(lib, "user32.lib")
+#pragma comment(lib, "kernel32.lib")
+#pragma comment(lib, "Shlwapi.lib")
 #endif
 
 #endif
