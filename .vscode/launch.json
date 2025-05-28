@@ -5,10 +5,21 @@
     "version": "0.2.0",
     "configurations": [
     {
-      "name": "Debug MSVC Executable",
+      "name": "Debug Win32 Executable",
       "type": "cppvsdbg",
       "request": "launch",
       "program": "${workspaceFolder}/build/app_debug.exe",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}/build",
+      "environment": [],
+      "console": "externalTerminal"
+    },
+        {
+      "name": "Run Debug Test Executable",
+      "type": "cppvsdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/build/test_app_debug.exe",
       "args": [],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}/build",
