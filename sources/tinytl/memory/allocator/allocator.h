@@ -1,25 +1,51 @@
 #ifndef ALLOCATOR_H
 #define ALLOCATOR_H
-//base Allcator
+// base Allcator
+//  Layer Roles:
+//  Layer	Function
+//  Policy	Allocates raw memory (allocate(n)) and returns a pointer
+//  Allocator	Combines policy.allocate() and traits.construct()
+//  Traits	Constructs the object using placement new: new(p) T(...)
 #include "policy/alloc_policy.h"
 #include "traits/allocator_traits.h"
-template< typename T, typename Policy =  AllocatorPolicy<T>, typename Traits = AllocatorTraits<T>>
-class Allocator : public Policy,public Traits
+
+struct AllocatorMetaData
+{
+    std::size_t m_totalSize = 0;
+    std::size_t m_used = 0;
+    std::size_t m_peak = 0;
+};
+
+template <typename T, typename Policy = AllocatorPolicy<T>, typename Traits = AllocatorTraits<T>, size_t MemoryBlockedSize = 0>
+class Allocator : public Policy, public Traits
 {
 public:
     typedef typename Policy::value_type value_type;
     typedef typename Policy::pointer pointer;
     typedef typename Policy::size_type size_type;
 
-    template<typename U>
+    template <typename U>
     struct rebind
     {
-        typedef Allocator<U,typename Policy::template rebind<U>::other,typename Traits::template rebind<U>::other> other;
+        typedef Allocator<U, typename Policy::template rebind<U>::other, typename Traits::template rebind<U>::other, MemoryBlockedSize> other;
     };
 
-    Allocator() noexcept {}
-    template<typename U>
+    explicit Allocator(const std::size_t totalSize = MemoryBlockedSize) noexcept
+        : m_metaData{totalSize, 0, 0}
+    {
+        int a;
+    }
+
+    // Copy constructor from another allocator
+    template <typename U>
     Allocator(const Allocator<U, typename Policy::template rebind<U>::other,
-                                    typename Traits::template rebind<U>::other>&) noexcept {}
+                              typename Traits::template rebind<U>::other, MemoryBlockedSize> &) noexcept
+        : m_metaData{MemoryBlockedSize, 0, 0}
+    {
+        int MemoryBlockedSize;
+    }
+
+protected:
+    AllocatorMetaData m_metaData;
 };
 #endif

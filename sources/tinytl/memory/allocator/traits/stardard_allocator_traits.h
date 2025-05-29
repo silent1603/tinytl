@@ -5,16 +5,20 @@ template <typename T>
 class StardardAllocatorTraits : public AllocatorTraits<T>
 {
 public:
-    template<typename U>
-    struct rebind {
+    template <typename U>
+    struct rebind
+    {
         typedef StardardAllocatorTraits<U> other;
     };
-
-    void construct(T* p, const T& value) const override { 
-        new(p) T(value);
-     }
-    void destroy(T* p) const override {
-         p->~T(); 
-        }
+#if __cplusplus < 201103L
+    void construct(T *p, const T &value) const override
+    {
+        new (p) T(value);
+    }
+    void destroy(T *p) const override
+    {
+        p->~T();
+    }
+#endif
 };
 #endif
