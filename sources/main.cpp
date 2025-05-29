@@ -95,7 +95,8 @@
 #include "tinytl/memory/allocator/allocator.h"
 #include "tinytl/memory/allocator/policy/stardard_alloc_policy.h"
 #include "tinytl/memory/allocator/traits/stardard_allocator_traits.h"
-int main(int argc,char* argv[])
+#include "tinytl/platform_selector.h"
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
     std::vector<int, Allocator<int, StardardAllocatorPolicy<int>,StardardAllocatorTraits<int>>> v;
     for (int i = 0; i < 10; ++i)

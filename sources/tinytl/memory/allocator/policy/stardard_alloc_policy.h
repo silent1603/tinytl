@@ -6,6 +6,10 @@ template <typename T>
 class StardardAllocatorPolicy : public AllocatorPolicy<T>
 {
 public:
+
+    template <typename U>
+    struct rebind { typedef StardardAllocatorPolicy<U> other;};
+
     pointer allocate(size_type n, const void* = 0) override {
         return reinterpret_cast<pointer>(::operator new(n * sizeof(T)));
     }
