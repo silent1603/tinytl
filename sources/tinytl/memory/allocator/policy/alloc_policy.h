@@ -7,9 +7,11 @@
 // How to deallocate that block
 // These operate on uninitialized raw memory — no objects are constructed or destroyed yet.
 // Think of this like: “Give me N bytes” and “Free this memory.”
-template <typename T>
+template <typename T, std::size_t Alignment>
 class AllocatorPolicy
 {
+protected:
+    size_t m_alignment = Alignment;
 public:
     typedef T value_type;
     typedef T *pointer;
@@ -39,5 +41,10 @@ public:
         return std::numeric_limits<size_type>::max() / sizeof(T);
     }
 #endif
+
+    constexpr const std::size_t GetAlignment() const
+    {
+        return m_alignment;
+    }
 };
 #endif

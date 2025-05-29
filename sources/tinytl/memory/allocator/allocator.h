@@ -14,9 +14,10 @@ struct AllocatorMetaData
     std::size_t m_totalSize = 0;
     std::size_t m_used = 0;
     std::size_t m_peak = 0;
+    std::size_t m_alignment  = 0
 };
 
-template <typename T, typename Policy = AllocatorPolicy<T>, typename Traits = AllocatorTraits<T>, size_t MemoryBlockedSize = 0>
+template <typename T,std::size_t Alignment = alignof(T), typename Policy = AllocatorPolicy<T,Alignment>, typename Traits = AllocatorTraits<T>, size_t MemoryBlockedSize = 0>
 class Allocator : public Policy, public Traits
 {
 public:
@@ -31,7 +32,7 @@ public:
     };
 
     explicit Allocator(const std::size_t totalSize = MemoryBlockedSize) noexcept
-        : m_metaData{totalSize, 0, 0}
+        : m_metaData{totalSize, 0, 0,Alignment}
     {
         int a;
     }
@@ -40,7 +41,7 @@ public:
     template <typename U>
     Allocator(const Allocator<U, typename Policy::template rebind<U>::other,
                               typename Traits::template rebind<U>::other, MemoryBlockedSize> &) noexcept
-        : m_metaData{MemoryBlockedSize, 0, 0}
+        : m_metaData{MemoryBlockedSize, 0, 0, Alignment}
     {
         int MemoryBlockedSize;
     }
