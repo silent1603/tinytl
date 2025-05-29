@@ -14,7 +14,7 @@ struct AllocatorMetaData
     std::size_t m_totalSize = 0;
     std::size_t m_used = 0;
     std::size_t m_peak = 0;
-    std::size_t m_alignment  = 0
+    std::size_t m_alignment  = 0;
 };
 
 template <typename T,std::size_t Alignment = alignof(T), typename Policy = AllocatorPolicy<T,Alignment>, typename Traits = AllocatorTraits<T>, size_t MemoryBlockedSize = 0>
@@ -25,10 +25,10 @@ public:
     typedef typename Policy::pointer pointer;
     typedef typename Policy::size_type size_type;
 
-    template <typename U>
+    template <typename U,std::size_t Alignment>
     struct rebind
     {
-        typedef Allocator<U, typename Policy::template rebind<U>::other, typename Traits::template rebind<U>::other, MemoryBlockedSize> other;
+        typedef Allocator<U,Alignment , typename Policy::template rebind<U>::other, typename Traits::template rebind<U>::other, MemoryBlockedSize> other;
     };
 
     explicit Allocator(const std::size_t totalSize = MemoryBlockedSize) noexcept
@@ -38,8 +38,8 @@ public:
     }
 
     // Copy constructor from another allocator
-    template <typename U>
-    Allocator(const Allocator<U, typename Policy::template rebind<U>::other,
+    template <typename U,std::size_t Alignment>
+    Allocator(const Allocator<U, Alignment, typename Policy::template rebind<U,Alignment>::other,
                               typename Traits::template rebind<U>::other, MemoryBlockedSize> &) noexcept
         : m_metaData{MemoryBlockedSize, 0, 0, Alignment}
     {

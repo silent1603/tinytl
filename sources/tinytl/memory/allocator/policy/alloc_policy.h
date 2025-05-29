@@ -18,10 +18,10 @@ public:
     typedef std::size_t size_type;
     typedef std::ptrdiff_t difference_type;
 
-    template <typename U>
+    template <typename U,std::size_t Alignment>
     struct rebind
     {
-        typedef AllocatorPolicy<U> other;
+        typedef AllocatorPolicy<U,Alignment> other;
     };
 
 #if __cplusplus < 201703L

@@ -4,14 +4,14 @@
 #include "alloc_policy.h"
 #include <stdlib.h> // for malloc ,free()
 
-template <typename T>
-class CAllocatorPolicy : public AllocatorPolicy<T>
+template <typename T, std::size_t Alignment>
+class CAllocatorPolicy : public AllocatorPolicy<T,Alignment>
 {
 public:
-    template <typename U>
+    template <typename U, std::size_t Alignment>
     struct rebind
     {
-        typedef CAllocatorPolicy<U> other;
+        typedef CAllocatorPolicy<U,Alignment> other;
     };
 
 #if __cplusplus < 201703L

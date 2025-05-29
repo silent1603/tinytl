@@ -2,14 +2,14 @@
 #define STARDARDALLOCATORPOLICY_H
 
 #include "alloc_policy.h"
-template <typename T>
-class StardardAllocatorPolicy : public AllocatorPolicy<T>
+template <typename T, std::size_t Alignment>
+class StardardAllocatorPolicy : public AllocatorPolicy<T,Alignment>
 {
 public:
-    template <typename U>
+    template <typename U,std::size_t Alignment>
     struct rebind
     {
-        typedef StardardAllocatorPolicy<U> other;
+        typedef StardardAllocatorPolicy<U,Alignment> other;
     };
 
 #if __cplusplus < 201703L
