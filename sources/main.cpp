@@ -98,7 +98,7 @@
 #include "tinytl/platform_selector.h"
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-    std::vector<int, Allocator<int, StardardAllocatorPolicy<int>,StardardAllocatorTraits<int>,512>> v;
+    std::vector<int, Allocator<int, alignof(int),StardardAllocatorPolicy<int,alignof(int)>,StardardAllocatorTraits<int>,512>> v;
     for (int i = 0; i < 10; ++i)
     {
         v.push_back(i);

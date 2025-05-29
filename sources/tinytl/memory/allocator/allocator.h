@@ -25,10 +25,10 @@ public:
     typedef typename Policy::pointer pointer;
     typedef typename Policy::size_type size_type;
 
-    template <typename U,std::size_t Alignment>
+    template <typename U,std::size_t Alignment = alignof(U)>
     struct rebind
     {
-        typedef Allocator<U,Alignment , typename Policy::template rebind<U>::other, typename Traits::template rebind<U>::other, MemoryBlockedSize> other;
+        typedef Allocator<U,Alignment , typename Policy::template rebind<U,Alignment>::other, typename Traits::template rebind<U>::other, MemoryBlockedSize> other;
     };
 
     explicit Allocator(const std::size_t totalSize = MemoryBlockedSize) noexcept

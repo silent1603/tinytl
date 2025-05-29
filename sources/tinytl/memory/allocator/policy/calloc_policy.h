@@ -8,7 +8,7 @@ template <typename T, std::size_t Alignment>
 class CAllocatorPolicy : public AllocatorPolicy<T,Alignment>
 {
 public:
-    template <typename U, std::size_t Alignment>
+    template <typename U,std::size_t Alignment >
     struct rebind
     {
         typedef CAllocatorPolicy<U,Alignment> other;
