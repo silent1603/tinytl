@@ -1,6 +1,7 @@
 #ifndef PLATFORM_H
 #define PLATOFRM_H
 #include "common.h"
+#include "config.h"
 #if SUPPORT_UTF8
 #endif
 

@@ -3,7 +3,8 @@
  * The OpenGL code is the same as that used in  
  * the X Window System sample 
  */ 
-#include "tinytl/renderer/renderer_platform_selector.h"
+#include "tinytl/platform_selector.h"
+#include "tinytl/memory/allocator/Arena.h"
  
 /* Windows globals, defines, and prototypes */ 
 CHAR szAppName[]="Win OpenGL"; 
@@ -95,6 +96,29 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
         } 
         drawScene(); 
     } 
+
+    Arena arena = arena_create(1024);
+
+    // Allocate 100 bytes
+    char *message = (char *)arena_alloc(&arena, 100);
+    strcpy(message, "Hello from the arena!");
+    printf("%s\n", message);
+
+
+    int *array = (int *)arena_alloc(&arena, sizeof(int) * 10);
+    for (int i = 0; i < 10; i++) array[i] = i * i;
+
+    for (int i = 0; i < 10; i++) printf("%d ", array[i]);
+    printf("\n");
+
+    arena_reset(&arena);
+
+    char *msg2 = (char *)arena_alloc(&arena, 50);
+    strcpy(msg2, "Reused memory!");
+    printf("%s\n", msg2);
+
+    // Clean up
+    arena_destroy(&arena);
 } 
  
 /* main window procedure */ 
