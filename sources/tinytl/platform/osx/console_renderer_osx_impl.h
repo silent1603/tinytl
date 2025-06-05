@@ -1,6 +1,6 @@
 #ifndef CONSOLE_RENDERER_OSX_IMPL_H
 #define CONSOLE_RENDERER_OSX_IMPL_H
-#include "tinytl/renderer/renderer_common.h"
+
 #ifdef PLATFORM_MACOS 
 
 

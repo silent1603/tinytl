@@ -74,6 +74,25 @@
             },
             "group": "build"
 
+        },
+        {
+            "label": "Build Debug Tests Windows",
+            "type": "shell",
+            "args": [],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "windows" :{
+                "command": "echo. | ${workspaceFolder}\\debug_test_build.bat"
+            },
+            "presentation": {
+                "reveal": "always"
+            },
+            "group": "build"
+
         }
     ]
 }

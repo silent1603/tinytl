@@ -27,6 +27,13 @@
 #pragma comment(lib, "user32.lib")
 #pragma comment(lib, "kernel32.lib")
 #pragma comment(lib, "Shlwapi.lib")
+
+#if MODULE_RENDERER
+#include <gl/GL.h>
+#pragma comment(lib, "OpenGL32.lib")
+#pragma comment(lib, "gdi32.lib")
+#endif
+
 #endif
 
 #endif

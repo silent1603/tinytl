@@ -4,7 +4,7 @@
 SOURCE_DIR="$(cd ./sources && pwd)"
 BUILD_DIR="./build"
 EXE_NAME="app_release"
-CPP_LIST="cpp_files.txt"
+CPP_LIST="c_files.txt"
 OBJ_LIST="obj_files.txt"
 
 # Choose compiler (default: clang++)
@@ -37,7 +37,7 @@ rm -f "$BUILD_DIR"/*.o "$BUILD_DIR/$EXE_NAME"
 
 # Find all .cpp files
 echo "Finding source files..."
-find "$SOURCE_DIR" -name '*.cpp' > "$CPP_LIST"
+find "$SOURCE_DIR" -name '*.c' > "$CPP_LIST"
 
 # === Start timer ===
 start_time=$(date +%s.%N)

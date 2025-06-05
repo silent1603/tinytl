@@ -7,7 +7,7 @@ call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build
 :: === Configuration ===
 set "source_dir=%~dp0sources"
 set "build_dir=%~dp0build"
-set "cpp_list=%build_dir%\cpp_files.txt"
+set "c_list=%build_dir%\cpp_files.txt"
 set "obj_list=%build_dir%\obj_files.txt"
 set "exe_name=app_debug.exe"
 set "compiler=cl"
@@ -20,12 +20,12 @@ if not exist "%build_dir%" mkdir "%build_dir%"
 :: Clean previous build
 echo Cleaning previous build...
 del /q "%build_dir%\*.obj" "%build_dir%\*.exe" "%build_dir%\*.pdb" >nul 2>&1
-del /q "%cpp_list%" "%obj_list%" >nul 2>&1
+del /q "%c_list%" "%obj_list%" >nul 2>&1
 
 :: Generate list of .cpp files
-echo Listing .cpp files...
+echo Listing .c files...
 pushd "%source_dir%"
-(for %%f in (*.cpp) do echo "%source_dir%\%%f") > "%cpp_list%"
+(for %%f in (*.c) do echo "%source_dir%\%%f") > "%c_list%"
 popd
 
 :: === Start Timer ===
@@ -33,7 +33,7 @@ set "startTime=%time: =0%"
 
 :: === Compile step ===
 echo Compiling...
-for /f %%f in ('type "%cpp_list%"') do (
+for /f %%f in ('type "%c_list%"') do (
     echo Compiling %%~f...
     %compiler% %%~f %cflags%
     if errorlevel 1 (

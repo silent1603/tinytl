@@ -1,6 +1,6 @@
 #ifndef CONSOLE_RENDERER_WIN32_IMPL_H
 #define CONSOLE_RENDERER_WIN32_IMPL_H
-#include "tinytl/renderer/renderer_common.h"
+#include "tinytl/common.h"
 #ifdef PLATFORM_WINDOWS
 #include <strsafe.h>
 struct ConsoleRendererData

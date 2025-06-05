@@ -5,7 +5,7 @@ SOURCE_DIR="$(cd ./sources && pwd)"
 TEST_DIR="$(cd ./tests && pwd)"
 BUILD_DIR="./build"
 EXE_NAME="tests_debug"
-CPP_LIST="tests_cpp_files.txt"
+C_LIST="tests_c_files.txt"
 OBJ_LIST="tests_obj_files.txt"
 
 # Choose compiler
@@ -22,7 +22,7 @@ LDFLAGS="-g"
 
 # Create build directory
 mkdir -p "$BUILD_DIR"
-rm -f "$CPP_LIST" "$OBJ_LIST"
+rm -f "$C_LIST" "$OBJ_LIST"
 
 # Clean previous build
 echo "Cleaning $BUILD_DIR..."
@@ -30,7 +30,7 @@ rm -f "$BUILD_DIR"/*.o "$BUILD_DIR/$EXE_NAME"
 
 # Find all .cpp files
 echo "Finding source files..."
-find "$TEST_DIR" -name '*.cpp' > "$CPP_LIST"
+find "$TEST_DIR" -name '*.c' > "$C_LIST"
 
 # === Start timer ===
 start_time=$(date +%s.%N)
@@ -42,7 +42,7 @@ while read -r src_file; do
     echo "Compiling $src_file -> $obj_file"
     $COMPILER $CFLAGS "$src_file" -o "$obj_file" || { echo "Compile error in $src_file"; exit 1; }
     echo "$obj_file" >> "$OBJ_LIST"
-done < "$CPP_LIST"
+done < "$C_LIST"
 
 # === Link ===
 echo "Linking with $COMPILER..."

@@ -1,6 +1,6 @@
 #ifndef CONSOLE_INPUT_WIN32_IMPL_H
 #define CONSOLE_INPUT_WIN32_IMPL_H
-#include "tinytl/io/input_common.h"
+#include "tinytl/common.h"
 #ifdef PLATFORM_WINDOWS 
 struct EventIn
 {

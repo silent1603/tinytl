@@ -1,6 +1,6 @@
 #ifndef RENDERER_OSX_IMPL_H
 #define RENDERER_OSX_IMPL_H
-#include "tinytl/renderer/renderer_common.h"
+
 #ifdef PLATFORM_MACOS 
 void Renderer_PlatformInit(Vector<int,RENDERER_PARAMETERS_INDICES::RENDERER_PARAMETERS_INDICES_SIZE> renderer_params) 
 {
