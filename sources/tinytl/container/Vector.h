@@ -1,10 +1,25 @@
 #ifndef VECTOR_H
 #define VECTOR_H
 
-#define DEFINE_VECTOR(Type, Dimension, Name) \
-    typedef struct Name {                    \
-        Type data[Dimension];                \
-} Name;
+template <typename T, size_t N>
+struct Vector
+{
+    T Data[N];
+};
+
+//class Template Specialization
+
+template <>
+struct Vector<float,4>
+{
+    union 
+    {
+        __m128 Vec;
+        float Data[4];
+        
+    };
+    
+};
 
 
 #endif

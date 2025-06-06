@@ -7,7 +7,7 @@ call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build
 :: === Configuration ===
 set "source_dir=%~dp0sources"
 set "build_dir=%~dp0build"
-set "cpp_list=%build_dir%\c_files.txt"
+set "cpp_list=%build_dir%\cpp_files.txt"
 set "obj_list=%build_dir%\obj_files.txt"
 set "exe_name=app_release.exe"
 set "compiler=cl"
@@ -24,7 +24,7 @@ del /q "%cpp_list%" "%obj_list%" >nul 2>&1
 :: === List source files ===
 echo Listing source files...
 pushd "%source_dir%"
-(for %%f in (*.c) do echo "%source_dir%\%%f") > "%cpp_list%"
+(for %%f in (*.cpp) do echo "%source_dir%\%%f") > "%cpp_list%"
 popd
 
 :: === Start Timer ===

@@ -4,7 +4,7 @@
 SOURCE_DIR="$(cd ./sources && pwd)"
 BUILD_DIR="./build"
 EXE_NAME="app_release"
-CPP_LIST="c_files.txt"
+CPP_LIST="cpp_list.txt"
 OBJ_LIST="obj_files.txt"
 
 # Choose compiler (default: clang++)

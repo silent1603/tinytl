@@ -8,7 +8,7 @@ call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build
 set "source_dir=%~dp0sources"
 set "tests_dir=%~dp0tests"
 set "build_dir=%~dp0build"
-set "c_list=%build_dir%\test_cpp_files.txt"
+set "cpp_list=%build_dir%\test_cpp_files.txt"
 set "obj_list=%build_dir%\test_obj_files.txt"
 set "exe_name=test_app_debug.exe"
 set "compiler=cl"
@@ -21,12 +21,12 @@ if not exist "%build_dir%" mkdir "%build_dir%"
 :: Clean previous build
 echo Cleaning previous build...
 del /q "%build_dir%\*.obj" "%build_dir%\*.exe" "%build_dir%\*.pdb" >nul 2>&1
-del /q "%c_list%" "%obj_list%" >nul 2>&1
+del /q "%cpp_list%" "%obj_list%" >nul 2>&1
 
 :: Generate list of .cpp files
 echo Listing .cpp files...
 pushd "%tests_dir%"
-(for %%f in (*.c) do echo "%tests_dir%\%%f") > "%c_list%"
+(for %%f in (*.cpp) do echo "%tests_dir%\%%f") > "%cpp_list%"
 popd
 
 :: === Start Timer ===
@@ -34,7 +34,7 @@ set "startTime=%time: =0%"
 
 :: === Compile step ===
 echo Compiling...
-for /f %%f in ('type "%c_list%"') do (
+for /f %%f in ('type "%cpp_list%"') do (
     echo Compiling %%~f...
     %compiler% %%~f %cflags%
     if errorlevel 1 (

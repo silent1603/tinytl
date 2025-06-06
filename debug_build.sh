@@ -4,7 +4,7 @@
 SOURCE_DIR="$(cd ./sources && pwd)"
 BUILD_DIR="./build"
 EXE_NAME="app_debug"
-c_list="c_files.txt"
+cpp_list="cpp_files.txt"
 OBJ_LIST="obj_files.txt"
 
 # Choose compiler
@@ -30,7 +30,7 @@ fi
 
 # Create build directory
 mkdir -p "$BUILD_DIR"
-rm -f "$c_list" "$OBJ_LIST"
+rm -f "$cpp_list" "$OBJ_LIST"
 
 # Clean previous build
 echo "Cleaning $BUILD_DIR..."
@@ -38,7 +38,7 @@ rm -f "$BUILD_DIR"/*.o "$BUILD_DIR/$EXE_NAME"
 
 # Find all .cpp files
 echo "Finding source files..."
-find "$SOURCE_DIR" -name '*.cpp' > "$c_list"
+find "$SOURCE_DIR" -name '*.cpp' > "$cpp_list"
 
 # === Start timer ===
 start_time=$(date +%s.%N)
@@ -50,7 +50,7 @@ while read -r src_file; do
     echo "Compiling $src_file -> $obj_file"
     $COMPILER $CFLAGS "$src_file" -o "$obj_file" || { echo "Compile error in $src_file"; exit 1; }
     echo "$obj_file" >> "$OBJ_LIST"
-done < "$c_list"
+done < "$cpp_list"
 
 # === Link ===
 echo "Linking with $COMPILER..."
