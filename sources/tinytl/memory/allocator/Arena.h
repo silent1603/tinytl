@@ -8,19 +8,20 @@
 #include <string.h>
 #include <assert.h>
 
-typedef struct Arena {
-    uint8_t *base;
+typedef struct {
+    uint8_t *data;
     size_t capacity;
-    size_t offset;
+    size_t size;
 } Arena;
 
 
-Arena arena_create(size_t capacity) {
-    Arena arena;
-    arena.base = (uint8_t*)malloc(capacity);
-    arena.capacity = capacity;
-    arena.offset = 0;
-    assert(arena.base && "Arena allocation failed!");
+Arena arena_init(size_t capacity) {
+    void* data = malloc(sizeof(uint8_t) * capacity);
+    Arena arena = {
+        .capacity = capacity,
+        .size = 0,
+        .data = data
+    };
     return arena;
 }
 
