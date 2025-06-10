@@ -48,6 +48,9 @@
         "xstring": "cpp",
         "xtr1common": "cpp",
         "xutility": "cpp",
-        "vector": "cpp"
+        "vector": "cpp",
+        "chrono": "c",
+        "window_system.h": "c",
+        "window_data.h": "c"
     }
 }

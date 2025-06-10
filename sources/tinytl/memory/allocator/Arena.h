@@ -16,36 +16,35 @@ typedef struct {
 
 
 Arena arena_init(size_t capacity) {
-    void* data = malloc(sizeof(uint8_t) * capacity);
     Arena arena = {
         .capacity = capacity,
         .size = 0,
-        .data = data
+        .data = 0
     };
     return arena;
 }
 
 
 void* arena_alloc(Arena *arena, size_t size) {
-    if (arena->offset + size > arena->capacity) {
+    if (arena->data + size > arena->capacity) {
         fprintf(stderr, "Arena out of memory!\n");
         return NULL;
     }
-    void *ptr = arena->base + arena->offset;
-    arena->offset += size;
+    void *ptr = arena->data + arena->size;
+    arena->size += size;
     return ptr;
 }
 
 
 void arena_reset(Arena *arena) {
-    arena->offset = 0;
+    arena->size = 0;
 }
 
 
 void arena_destroy(Arena *arena) {
-    free(arena->base);
-    arena->base = NULL;
+    free(arena->data);
+    arena->data = NULL;
     arena->capacity = 0;
-    arena->offset = 0;
+    arena->size = 0;
 }
 #endif

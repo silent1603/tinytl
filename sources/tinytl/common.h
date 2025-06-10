@@ -36,5 +36,6 @@ enum PixelFormat {
 // ########################################################################################
 
 #define MAX_EVENT_RECEIVED 128
+#define MAX_WINDOW_SUPPORT 16
 
 #endif
