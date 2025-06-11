@@ -51,6 +51,8 @@
         "vector": "cpp",
         "chrono": "c",
         "window_system.h": "c",
-        "window_data.h": "c"
+        "window_data.h": "c",
+        "*.rh": "cpp",
+        "optional": "cpp"
     }
 }

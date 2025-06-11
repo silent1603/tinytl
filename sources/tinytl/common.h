@@ -1,5 +1,7 @@
 #ifndef COMMON_H
 #define COMMON_H
+
+// Freestanding
 #include <float.h>
 #include <limits.h>
 #include <iso646.h>
@@ -9,6 +11,8 @@
 #include <stdint.h>
 #include <stdalign.h>
 #include <stdnoreturn.h>
+
+#include "platform_selector.h"
 
 enum CharacterEncoding {
     ASCII,
@@ -37,5 +41,12 @@ enum PixelFormat {
 
 #define MAX_EVENT_RECEIVED 128
 #define MAX_WINDOW_SUPPORT 16
+#define MAX_SAMPLES_SUPPORTED 32
+
+#if PLATFORM_WINDOWS
+#define CLASSNAME "tinytl"
+#define MAIN_WINDOW_TITLE "tinytl"
+#endif
+
 
 #endif

@@ -1,6 +1,5 @@
 #ifndef PLATFORM_H
 #define PLATOFRM_H
-#include "common.h"
 #include "config.h"
 #if SUPPORT_UTF8
 #endif
@@ -30,8 +29,8 @@
 
 #if MODULE_RENDERER
 #include <gl/GL.h>
-#include "tinytl/graphics/opengl/glext.h"
-#include "tinytl/graphics/opengl/wglext.h"
+#include "tinytl/renderer/opengl/glext.h"
+#include "tinytl/renderer/opengl/wglext.h"
 #pragma comment(lib, "OpenGL32.lib")
 #pragma comment(lib, "gdi32.lib")
 #endif

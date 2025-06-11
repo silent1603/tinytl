@@ -38,36 +38,7 @@ void polarView( GLdouble, GLdouble, GLdouble, GLdouble);
  
 int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) 
 { 
-    MSG        msg; 
-    WNDCLASS   wndclass; 
- 
-    /* Register the frame class */ 
-    wndclass.style         = 0; 
-    wndclass.lpfnWndProc   = (WNDPROC)MainWndProc; 
-    wndclass.cbClsExtra    = 0; 
-    wndclass.cbWndExtra    = 0; 
-    wndclass.hInstance     = hInstance; 
-    wndclass.hIcon         = LoadIcon (hInstance, TEXT(APPNAME)); 
-    wndclass.hCursor       = LoadCursor (NULL,IDC_ARROW); 
-    wndclass.hbrBackground = (HBRUSH)(COLOR_WINDOW+1); 
-    wndclass.lpszMenuName  = TEXT(APPNAME); 
-    wndclass.lpszClassName = TEXT(APPNAME); 
- 
-    if (!RegisterClass (&wndclass) ) 
-        return FALSE; 
- 
-    /* Create the frame */ 
-    ghWnd = CreateWindow (TEXT(APPNAME), 
-             TEXT("Generic OpenGL Sample"), 
-         WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 
-             CW_USEDEFAULT, 
-             CW_USEDEFAULT, 
-             WIDTH, 
-             HEIGHT, 
-             NULL, 
-             NULL, 
-             hInstance, 
-             NULL); 
+
  
     /* make sure window was created */ 
     if (!ghWnd) 
@@ -92,5 +63,7 @@ int WINAPI WinMain (HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
         } 
         drawScene(); 
     } 
+    return 0;
+}
 
  
