@@ -2,7 +2,7 @@
 #define INPUT_WIN32_H
 #include "common.h"
 #if PLATFORM_WINDOWS
-LRESULT CALLBACK WndProc(HWND hWnd,
+LRESULT CALLBACK WindowProc(HWND hWnd,
 						 UINT msg,
 						 WPARAM wParam,
 						 LPARAM lParam)

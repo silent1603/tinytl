@@ -53,6 +53,7 @@
         "window_system.h": "c",
         "window_data.h": "c",
         "*.rh": "cpp",
-        "optional": "cpp"
+        "optional": "cpp",
+        "common.h": "c"
     }
 }

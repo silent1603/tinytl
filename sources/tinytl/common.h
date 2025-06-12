@@ -40,13 +40,22 @@ enum PixelFormat {
 // ########################################################################################
 
 #define MAX_EVENT_RECEIVED 128
-#define MAX_WINDOW_SUPPORT 16
 #define MAX_SAMPLES_SUPPORTED 32
 
 #if PLATFORM_WINDOWS
-#define CLASSNAME "tinytl"
-#define MAIN_WINDOW_TITLE "tinytl"
+
 #endif
 
+enum EWindowTag
+{
+    MAIN_MENU = 0,
+    TEST_WINDOW,
+    MAX_WINDOW_SUPPORTED
+};
+
+const char* WindowNameCollections[] = {
+    TEXT("Main Window"),
+    TEXT("OpenGL Test Window")
+};
 
 #endif

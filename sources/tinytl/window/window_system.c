@@ -1,3 +1,3 @@
 #include "window_system.h"
 
-WindowSystemData windowSystemdata = { .currentWindowFocus = 0, .currentWindowSize = 0};
+WindowSystemData windowSystemData = { .currentWindowFocus = 0, .currentWindowSize = 0};
