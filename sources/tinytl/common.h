@@ -46,16 +46,5 @@ enum PixelFormat {
 
 #endif
 
-enum EWindowTag
-{
-    MAIN_MENU = 0,
-    TEST_WINDOW,
-    MAX_WINDOW_SUPPORTED
-};
-
-const char* WindowNameCollections[] = {
-    TEXT("Main Window"),
-    TEXT("OpenGL Test Window")
-};
 
 #endif
