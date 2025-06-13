@@ -15,9 +15,9 @@ struct ConsoleRendererData
     CONSOLE_CURSOR_INFO cursorInfo[2]; // old , current
     COORD bufferSize = {0, 0};
     COORD bufferCoord = {0, 0};
-    Vector<int, 2> maxWindowPixelSize;
-    Vector<int, 2> currentWindowPixelSize;
-    Vector<int, 2> fontSize;
+    Vector2i maxWindowPixelSize;
+    Vector2i currentWindowPixelSize;
+    Vector2i fontSize;
 };
 
 void PrintLastError(const wchar_t *context)
@@ -45,8 +45,8 @@ void PrintLastError(const wchar_t *context)
 
 struct ConsoleRendererInitParams
 {
-    Vector<int, 2> windowSize = {0};
-    Vector<int, 2> fontSize = {MIN_FONT_WIDTH, MIN_FONT_HEIGHT}; // width , height;
+    Vector2i windowSize = {0};
+    Vector2i fontSize = {MIN_FONT_WIDTH, MIN_FONT_HEIGHT}; // width , height;
     CONSOLE_CURSOR_INFO cursorInfo;
     DWORD consoleIOMode[2] = {ENABLE_EXTENDED_FLAGS | ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT, ENABLE_VIRTUAL_TERMINAL_PROCESSING};
 };

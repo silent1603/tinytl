@@ -3,9 +3,30 @@
 #include "common.h"
 #include "window_system.h"
 
+
+// define scene
+#define WINDOW_TAG_LIST \
+    X(CLASS_NAME,"TinyRenderer") \
+    X(MAIN_MENU,"Main Window") \
+    X(DUMMY_WINDOW,"Dummy Window") 
+
+enum  { 
+    #define X(tag,name) tag, 
+    WINDOW_TAG_LIST 
+    MAX_WINDOW_SUPPORTED 
+    #undef X 
+} EWindowTag;
+
+const char* WindowName[] =
+{
+    #define X(tag,name) name,
+    WINDOW_TAG_LIST
+    #undef X
+};
+
 // Window data structure
 typedef struct {
-#ifdef PLATFORM_WINDOWS
+#if PLATFORM_WINDOWS
     HWND hwnd;
     HDC hdc;
 #endif
@@ -15,12 +36,12 @@ typedef struct {
     int depthBits;
     int stencilBits;
     int properties;
-    EWindowTag tag;
+    enum EWindowTag tag;
 } WindowData;
 
 typedef struct
 {
-#ifdef PLATFORM_WINDOWS
+#if PLATFORM_WINDOWS
     HINSTANCE hInstance;
 #endif
 
@@ -28,7 +49,7 @@ typedef struct
 
 typedef struct
 {
-#ifdef PLATFORM_WINDOWS
+#if PLATFORM_WINDOWS
     HINSTANCE hInstance;
 #endif
     WindowData windows[MAX_WINDOW_SUPPORTED];
@@ -40,14 +61,45 @@ typedef struct
 #define CURRENT_WINDOW_SIZE windowSystemData.windows[windowSystemData.currentWindowSize] 
 #define CURRENT_WINDOW_FOCUS windowSystemData.windows[windowSystemData.currentWindowFocus] 
 
-#ifdef PLATFORM_WINDOWS
+#if PLATFORM_WINDOWS
 #define CURRENT_WINDOW_FOCUS_HWND windowSystemData.windows[windowSystemData.currentWindowFocus].hwnd
 #define CURRENT_WINDOW_FOCUS_HDC windowSystemData.windows[windowSystemData.currentWindowFocus].hdc
 #endif 
 
+
+// --------------------------------- WINDOW SUPPORT FUNCTION -------------------------------------- //
+#if PLATFORM_WINDOWS
+HWND WindowSystem_CreateDummyWindow() {
+    WNDCLASS wc = {0};
+    wc.lpfnWndProc = DefWindowProc;
+    wc.hInstance = GetModuleHandle(NULL);
+    wc.lpszClassName = WindowName[DUMMY_WINDOW];
+    RegisterClass(&wc);
+
+    HWND hwnd = CreateWindow(WindowName[DUMMY_WINDOW], NULL, 0, 0, 0, 1, 1,
+                             NULL, NULL, GetModuleHandle(NULL), NULL);
+    return hwnd;
+}
+
+LRESULT CALLBACK DummyWindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	switch(message)
+	{
+		case WM_CREATE:
+			return 0;
+		case WM_DESTROY:
+			return 0;
+	}
+	return DefWindowProc(hWnd, message, wParam, lParam);
+}
+
+
+#endif
+// --------------------------------- LINUX SUPPORT FUNCTION -------------------------------------- //
+
 inline int WindowSystem_Init(WindowSystemInitParams params)
 {
-#ifdef PLATFORM_WINDOWS
+#if PLATFORM_WINDOWS
     windowSystemData.hInstance = params.hInstance;
 #endif
     return true;
@@ -56,31 +108,9 @@ inline int WindowSystem_Init(WindowSystemInitParams params)
 inline int Window_Create(WindowData data)
 {
     int result = 0;
-    WNDCLASSEX wc = {0};
-    wc.cbSize = sizeof(WNDCLASSEX);
-    wc.lpfnWndProc = WindowProc;
-    wc.hInstance = windowSystemData.hInstance;
-    wc.lpszClassName = WindowNameCollections[MAIN_MENU];
-    result = RegisterClass(&wc);
-    if (result)
-    {
-        CURRENT_WINDOW_FOCUS_HWND = CreateWindowEx(WindowNameCollections[MAIN_MENU], WindowNameCollections[MAIN_MENU], WS_OVERLAPPEDWINDOW,
-                                CW_USEDEFAULT, CW_USEDEFAULT, CURRENT_WINDOW_FOCUS.screen[0], CURRENT_WINDOW_FOCUS.screen[1],
-                                NULL, NULL, windowSystemData.hInstance, NULL);
-    if (!window->hwnd) {
-        fprintf(stderr, "Failed to create window\n");
-        return 0;
-    }
+#if PLATFORM_WINDOWS
 
-    window->hdc = GetDC(window->hwnd);
-    if (!window->hdc) {
-        DestroyWindow(window->hwnd);
-        return 0;
-    }
-
-        ShowWindow(window->hwnd, SW_SHOW);
-
-    }
+#endif
 
     return result;
 }
@@ -110,7 +140,7 @@ inline bool PollEvents()
 
 inline void Window_SwapBuffers()
 {
-    #ifdef PLATFORM_WINDOWS
+    #if PLATFORM_WINDOWS
         SwapBuffers(CURRENT_WINDOW_FOCUS_HDC);	
     #endif
 }
@@ -139,7 +169,7 @@ inline void Window_SetFocusWindow(int index)
     windowSystemData.currentWindowFocus = index;
 }
 
-inline int Window_GetWindowByTag(EWindowTag tag)
+inline int Window_GetWindowByTag(enum EWindowTag tag)
 {
     int resultTag = -1;
     for(int i = 0 ; i < MAX_WINDOW_SUPPORTED; ++i)

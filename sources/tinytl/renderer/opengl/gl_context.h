@@ -1,14 +1,12 @@
 #ifndef GL_CONTEXT
 #define GL_CONTEXT
-
+#include "tinytl/common.h"
 
 // GLContext data structure
 typedef struct {
 #ifdef _WIN32
     HGLRC hglrc;
 #elif 
-    GLXContext glx_context;
-    Display* display; // Needed for GLX operations
 #endif
 } GLContext;
 
